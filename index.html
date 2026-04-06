@@ -24,7 +24,7 @@
         button { background: #ff914d; border: none; border-radius: 60px; padding: 12px 20px; font-weight: bold; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 0 #a34100; transform: translateY(-2px); transition: 0.05s linear; color: #1e2a2f; }
         button:active { transform: translateY(2px); box-shadow: 0 1px 0 #a34100; }
         button.secondary { background: #2c5f7a; box-shadow: 0 4px 0 #153e52; color: white; }
-        .feedback { background: #000000aa; border-radius: 32px; padding: 14px; margin: 18px 0 0; text-align: center; border-left: 6px solid #ffb347; }
+        .feedback { background: #000000aa; border-radius: 32px; padding: 14px; margin: 18px 0 0; text-align: center; border-left: 6px solid #ffb347; color: white; }
         .points-badge { background: #2f4858; display: inline-block; border-radius: 30px; padding: 6px 16px; font-size: 0.9rem; }
         .highscore-list { list-style: none; padding: 0; margin: 15px 0; }
         .highscore-list li { background: #1f2f38; margin: 8px 0; padding: 8px 15px; border-radius: 60px; display: flex; justify-content: space-between; font-weight: bold; }
@@ -40,10 +40,10 @@
 <div class="game-container">
     <div class="quiz-panel">
         <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap;">
-            <h1>🔢 POTÊNCIA & RAIZ</h1>
-            <div class="points-badge" id="rankingStatus">🌍 Ranking Global (Google Sheets)</div>
+            <h1>Lista 5 de Matemática</h1>
+            <div class="points-badge" id="rankingStatus">🌍 Ranking Global</div>
         </div>
-        <div class="sub">⚡ LaTeX | 5 fáceis + 3 médias + 1 difícil + 1 muito difícil</div>
+        <div class="sub">Potência e Raiz</div>
         <div class="stats">
             <div class="stat">💯 TOTAL: <span id="totalScore">0</span> pts</div>
             <div class="stat">⭐ PERGUNTA: <span id="currentQValue">10.00</span> pts</div>
@@ -65,7 +65,7 @@
         <ul id="highscoreList" class="highscore-list"><li>Carregando ranking...</li></ul>
         <button id="refreshRankBtn" class="reset-btn" style="background:#2c5f7a;">🔄 ATUALIZAR RANKING</button>
         <div style="font-size: 0.7rem; margin-top: 12px; text-align: center; color:#7f9faa;" id="rankSourceMsg">
-            📡 Conectando ao Google Sheets...
+            📡 Conectando...
         </div>
     </div>
 </div>
@@ -139,6 +139,16 @@
     
     // ========== BANCO DE PERGUNTAS ==========
     const QUESTIONS_BANK = [
+        { text: "Calcule \\(2^{3} \\times 2^{2}\\)", answerNum: 32, difficulty: "easy" },
+        { text: "Qual é o valor de \\(3^{2} \\times 3^{3}\\)?", answerNum: 243, difficulty: "easy" },
+        { text: "Resolva \\(5^{4} \\div 5^{2}\\)", answerNum: 25, difficulty: "easy" },
+        { text: "Simplifique \\( (2^{3})^{2} \\)", answerNum: 64, difficulty: "easy" },
+        { text: "Calcule \\(7^{0} \\times 7^{2}\\)", answerNum: 49, difficulty: "easy" },
+        { text: "Determine \\(10^{5} \\div 10^{3}\\)", answerNum: 100, difficulty: "easy" },
+        { text: "Quanto vale \\( (-3)^{2} \\)?", answerNum: 9, difficulty: "easy" },
+        { text: "Resolva \\( (\\frac{1}{2})^{3} \\)", answerNum: 0.125, difficulty: "easy" },
+        { text: "Calcule \\(4^{3} \\div 4^{1}\\)", answerNum: 16, difficulty: "easy" },
+        { text: "Qual é o resultado de \\( (0.5)^{2} \\)?", answerNum: 0.25, difficulty: "easy" },
         { text: "Calcule \\(2^3 \\times 2^4\\)", answerNum: 128, difficulty: "easy" },
         { text: "Qual o valor de \\(9^{1/2}\\)?", answerNum: 3, difficulty: "easy" },
         { text: "Resolva \\((2^2)^3\\)", answerNum: 64, difficulty: "easy" },
@@ -156,6 +166,16 @@
         { text: "\\(2^{-3}\\)", answerNum: 0.125, difficulty: "easy" },
         { text: "Raiz quadrada de \\(0.25\\)", answerNum: 0.5, difficulty: "easy" },
         { text: "Raiz quarta de \\(16\\)", answerNum: 2, difficulty: "easy" },
+        { text: "Calcule \\(27^{\\frac{2}{3}}\\)", answerNum: 9, difficulty: "medium" },
+        { text: "Resolva \\(16^{\\frac{3}{4}}\\)", answerNum: 8, difficulty: "medium" },
+        { text: "Determine \\( (\\frac{8}{27})^{\\frac{2}{3}} \\)", answerNum: 4/9, difficulty: "medium" },
+        { text: "Simplifique \\( \\frac{2^{n+2}}{2^{n-1}} \\)", answerNum: 8, difficulty: "medium" },
+        { text: "Calcule \\( (4^{\\frac{1}{2}})^{3} \\)", answerNum: 8, difficulty: "medium" },
+        { text: "Resolva \\( 9^{-\\frac{1}{2}} \\)", answerNum: 1/3, difficulty: "medium" },
+        { text: "Determine o valor de \\( (\\frac{1}{4})^{-\\frac{1}{2}} \\)", answerNum: 2, difficulty: "medium" },
+        { text: "Simplifique \\( (a^{3} \\cdot a^{5}) \\div a^{4} \\) (para a=2)", answerNum: 16, difficulty: "medium" },
+        { text: "Calcule \\( 32^{\\frac{2}{5}} \\)", answerNum: 4, difficulty: "medium" },
+        { text: "Resolva \\( (3^{2})^{\\frac{1}{2}} \\times 3^{1} \\)", answerNum: 9, difficulty: "medium" },
         { text: "\\(27^{2/3}\\)", answerNum: 9, difficulty: "medium" },
         { text: "\\((\\frac{1}{2})^{-2}\\)", answerNum: 4, difficulty: "medium" },
         { text: "\\(9^{3/2}\\)", answerNum: 27, difficulty: "medium" },
@@ -163,17 +183,37 @@
         { text: "\\(2^{10} / 2^8\\)", answerNum: 4, difficulty: "medium" },
         { text: "Raiz quinta de \\(32\\)", answerNum: 2, difficulty: "medium" },
         { text: "\\((-1)^{100}\\)", answerNum: 1, difficulty: "medium" },
+        { text: "Resolva \\( \\left( \\frac{9}{16} \\right)^{-\\frac{3}{2}} \\)", answerNum: 64/27, difficulty: "hard" },
+        { text: "Simplifique \\( \\frac{ (2^{3})^{4} \\cdot 2^{-5} }{ 2^{6} } \\)", answerNum: 2, difficulty: "hard" },
+        { text: "Calcule \\( (0.125)^{-\\frac{2}{3}} \\)", answerNum: 4, difficulty: "hard" },
+        { text: "Determine \\( \\left( \\frac{27}{8} \\right)^{\\frac{2}{3}} \\right) \\)", answerNum: 9/4, difficulty: "hard" },
+        { text: "Resolva \\( \\frac{2^{x+1} \\cdot 4^{1-x}}{8^{x}} \\) para x = 3", answerNum: 0.015625, difficulty: "hard" },
+        { text: "Calcule \\( (16^{\\frac{3}{4}} \\div 8^{\\frac{2}{3}}) \\)", answerNum: 2, difficulty: "hard" },
+        { text: "Simplifique \\( \\frac{ (3^{2})^{3} \\cdot 27^{-1} }{ 9^{2} } \\)", answerNum: 1, difficulty: "hard" },
+        { text: "Determine \\( \\left( \\frac{1}{81} \\right)^{-\\frac{3}{4}} \\)", answerNum: 27, difficulty: "hard" },
+        { text: "Resolva \\( 4^{\\frac{3}{2}} \\times 8^{-\\frac{2}{3}} \\)", answerNum: 2, difficulty: "hard" },
+        { text: "Calcule \\( (2^{\\frac{1}{2}} \\cdot 2^{\\frac{3}{2}})^{2} \\)", answerNum: 16, difficulty: "hard" },
         { text: "Resolva \\( (\\sqrt[3]{27})^4 \\)", answerNum: 81, difficulty: "hard" },
         { text: "\\( \\left(\\frac{8}{27}\\right)^{2/3} \\)", answerNum: 4/9, difficulty: "hard" },
         { text: "Simplifique \\( \\frac{2^{n+2} \\cdot 4^{n-1}}{8^{n}} \\)", answerNum: 1, difficulty: "hard" },
         { text: "Determine \\( \\left(\\sqrt[4]{81}\\right)^{3/2} \\)", answerNum: 27, difficulty: "very_hard" },
+        { text: "Resolva \\( \\left( \\frac{8}{27} \\right)^{-\\frac{2}{3}} \\times \\left( \\frac{9}{4} \\right)^{\\frac{1}{2}} \\)", answerNum: 9/4, difficulty: "very_hard" },
+        { text: "Simplifique \\( \\frac{2^{n+3} \\cdot 4^{n-1}}{8^{n} \\cdot 16^{n-2}} \\) para n = 2", answerNum: 2, difficulty: "very_hard" },
+        { text: "Calcule \\( (0.25)^{-\\frac{3}{2}} \\div (0.125)^{\\frac{2}{3}} \\)", answerNum: 32, difficulty: "very_hard" },
+        { text: "Determine o valor de \\( \\left( \\frac{16}{81} \\right)^{-\\frac{3}{4}} \\cdot \\left( \\frac{27}{8} \\right)^{\\frac{2}{3}} \\)", answerNum: 27/16, difficulty: "very_hard" },
+        { text: "Resolva \\( \\frac{ (2^{x} \\cdot 4^{x-1}) }{ 8^{x+1} } \\) para x = 1", answerNum: 0.015625, difficulty: "very_hard" },
+        { text: "Calcule \\( \\left( \\frac{1}{9} \\right)^{-\\frac{3}{2}} \\times \\left( \\frac{1}{27} \\right)^{-\\frac{2}{3}} \\)", answerNum: 81, difficulty: "very_hard" },
+        { text: "Simplifique \\( \\frac{ (a^{2} \\cdot b^{-1})^{3} }{ (a^{-1} \\cdot b^{2})^{-2} } \\) para a=2, b=4", answerNum: 0.125, difficulty: "very_hard" },
+        { text: "Resolva \\( \\left( \\frac{3}{4} \\right)^{-2} \\times \\left( \\frac{8}{9} \\right)^{\\frac{1}{2}} \\)", answerNum: 16/9, difficulty: "very_hard" },
+        { text: "Determine \\( \\frac{ (2^{\\frac{1}{2}} \\cdot 4^{\\frac{3}{4}}) }{ (8^{\\frac{2}{3}}) } \\)", answerNum: 2, difficulty: "very_hard" },
+        { text: "Calcule \\( \\left( \\frac{1}{2} \\right)^{-3} \\times \\left( \\frac{1}{4} \\right)^{\\frac{1}{2}} \\div \\left( \\frac{1}{8} \\right)^{-\\frac{2}{3}} \\)", answerNum: 1, difficulty: "very_hard" },
         { text: "Resolva \\( \\frac{2^{x+1} \\cdot 4^{1-x}}{8^{x}} \\) para x=2", answerNum: 0.125, difficulty: "very_hard" }
     ];
     
-    const QUESTIONS_PER_GAME = 10;
+    const QUESTIONS_PER_GAME = 15;
     const BASE_POINTS = 10;
-    const PASS_THRESHOLD = 90;
-    const DIFFICULTY_CONFIG = { easy:5, medium:3, hard:1, very_hard:1 };
+    const PASS_THRESHOLD = 100;
+    const DIFFICULTY_CONFIG = { easy:8, medium:4, hard:2, very_hard:1 };
     
     let currentGame = [];
     let currentIndex = 0;
@@ -256,7 +296,7 @@
         const percent = (finalScore / (QUESTIONS_PER_GAME * BASE_POINTS)) * 100;
         let html = `<div class="final-message">
             <strong>🏁 FIM DE JOGO!</strong><br>
-            🎯 Pontuação: ${finalScore.toFixed(2)} / 100<br>
+            🎯 Pontuação: ${finalScore.toFixed(2)} / 150<br>
             📈 ${percent.toFixed(1)}%<br>
             ${passed ? '✅ APROVADO! ✅' : '❌ REPROVADO ❌'}
         </div>
@@ -320,7 +360,7 @@
             currentValue /= 2;
             if (currentValue < 0.001) currentValue = 0;
             qValueSpan.innerText = currentValue.toFixed(4);
-            feedbackDiv.innerHTML = `❌ Errado! Resposta: ${correct}. Valor caiu para ${currentValue.toFixed(2)} pts. Tente novamente.`;
+            feedbackDiv.innerHTML = `❌ Errado! Valor caiu para ${currentValue.toFixed(2)} pts. Tente novamente.`;
             answerInput.value = "";
             answerInput.focus();
             updateUI();
