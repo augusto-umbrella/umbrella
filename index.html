@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>⚡ Potência Raiz Game | Aprenda potências e radiciação</title>
+    <title>⚡ Potência & Raiz Game | LaTeX + Dificuldades</title>
+    <!-- MathJax para renderização LaTeX -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
     <style>
         * {
             box-sizing: border-box;
@@ -20,7 +22,6 @@
             align-items: center;
         }
 
-        /* container principal */
         .game-container {
             max-width: 1300px;
             width: 100%;
@@ -31,7 +32,6 @@
             justify-content: center;
         }
 
-        /* painel do jogo */
         .quiz-panel {
             flex: 2;
             min-width: 280px;
@@ -43,7 +43,6 @@
             border: 1px solid rgba(255,255,255,0.2);
         }
 
-        /* high scores lateral */
         .highscore-panel {
             flex: 1;
             min-width: 240px;
@@ -52,7 +51,6 @@
             padding: 20px;
             box-shadow: 0 15px 25px rgba(0,0,0,0.5);
             border: 1px solid #2c4c5c;
-            backdrop-filter: blur(4px);
         }
 
         h1 {
@@ -63,7 +61,6 @@
             background-clip: text;
             color: transparent;
             text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            display: inline-block;
         }
 
         .sub {
@@ -80,16 +77,25 @@
             padding: 20px;
             margin: 20px 0;
             border: 1px solid #ffb34755;
-            transition: all 0.2s;
         }
 
         .question-text {
-            font-size: 1.7rem;
+            font-size: 1.8rem;
             font-weight: bold;
             color: #ffefcf;
             margin-bottom: 20px;
             word-break: break-word;
             line-height: 1.3;
+            overflow-x: auto;
+            background: #00000033;
+            padding: 15px;
+            border-radius: 24px;
+            text-align: center;
+        }
+
+        /* Estilo para equações MathJax */
+        .question-text mjx-container {
+            font-size: 1.2em;
         }
 
         .stats {
@@ -245,6 +251,16 @@
             color: white;
         }
 
+        .difficulty-badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            background: #00000077;
+            border-radius: 20px;
+            padding: 2px 10px;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
         @media (max-width: 750px) {
             .quiz-panel, .highscore-panel {
                 flex: 1 1 100%;
@@ -262,7 +278,7 @@
             <h1>🔢 POTÊNCIA & RAIZ</h1>
             <div class="points-badge">🎯 meta: 70% (70 pts)</div>
         </div>
-        <div class="sub">⚡ potência fracionária | radiciação | propriedades</div>
+        <div class="sub">⚡ LaTeX | potência fracionária | radiciação | 5 fáceis + 3 médias + 1 difícil + 1 muito difícil</div>
 
         <div class="stats">
             <div class="stat">💯 TOTAL: <span id="totalScore">0</span> pts</div>
@@ -292,71 +308,88 @@
         <button id="resetHighScoresBtn" class="reset-btn">🗑️ LIMPAR RECORDES</button>
         <div style="font-size: 0.75rem; margin-top: 12px; text-align: center; color: #7f9faa;">
             ✔️ A cada erro os pontos da questão caem pela metade<br>
-            ✔️ Passe com 70% da pontuação máxima (70/100)
+            ✔️ Passe com 70% da pontuação máxima (70/100)<br>
+            ✔️ High scores salvos no seu navegador (localStorage)
         </div>
     </div>
 </div>
 
 <script>
     // --------------------------------------------------------------
-    //  BANCO DE PERGUNTAS (40 questões - números / frações exatas)
+    //  BANCO DE PERGUNTAS com LaTeX e DIFICULDADE
     // --------------------------------------------------------------
     const QUESTIONS_BANK = [
-        { text: "Calcule 2³ × 2⁴", answerNum: 128 },
-        { text: "Qual o valor de 9^(1/2)? (raiz quadrada de 9)", answerNum: 3 },
-        { text: "Resolva (2²)³", answerNum: 64 },
-        { text: "Quanto é 4⁻²? (use decimal ou fração)", answerNum: 0.0625 },
-        { text: "Raiz quadrada de 16", answerNum: 4 },
-        { text: "Calcule 8^(2/3)", answerNum: 4 },
-        { text: "Simplifique 2⁵ / 2³", answerNum: 4 },
-        { text: "Quanto vale 5⁰?", answerNum: 1 },
-        { text: "Raiz cúbica de 27", answerNum: 3 },
-        { text: "10³ × 10⁻²", answerNum: 10 },
-        { text: "16^(1/4)", answerNum: 2 },
-        { text: "27^(2/3)", answerNum: 9 },
-        { text: "0⁵", answerNum: 0 },
-        { text: "(-2)³", answerNum: -8 },
-        { text: "(-2)²", answerNum: 4 },
-        { text: "2⁻³", answerNum: 0.125 },
-        { text: "Raiz quadrada de 0.25", answerNum: 0.5 },
-        { text: "Raiz quarta de 16", answerNum: 2 },
-        { text: "Calcule (3²)^(1/2)", answerNum: 3 },
-        { text: "81^(1/2)", answerNum: 9 },
-        { text: "100^(1/2)", answerNum: 10 },
-        { text: "2^(1/2) × 2^(1/2)", answerNum: 2 },
-        { text: "Qual o resultado de 7¹?", answerNum: 7 },
-        { text: "Calcule (1/2)⁻²", answerNum: 4 },
-        { text: "(2³)⁰", answerNum: 1 },
-        { text: "Raiz cúbica de 64", answerNum: 4 },
-        { text: "2⁴ × 2⁻²", answerNum: 4 },
-        { text: "9^(3/2)", answerNum: 27 },
-        { text: "25^(1/2)", answerNum: 5 },
-        { text: "Simplifique (4²)^(1/2)", answerNum: 4 },
-        { text: "10⁻¹", answerNum: 0.1 },
-        { text: "Raiz quadrada de 144", answerNum: 12 },
-        { text: "64^(1/3)", answerNum: 4 },
-        { text: "(2⁵)/(2²)", answerNum: 8 },
-        { text: "(3³)^(1/3)", answerNum: 3 },
-        { text: "2¹⁰ / 2⁸", answerNum: 4 },
-        { text: "Raiz quinta de 32", answerNum: 2 },
-        { text: "(-1)¹⁰⁰", answerNum: 1 },
-        { text: "(-1)⁹⁹", answerNum: -1 },
-        { text: "0¹", answerNum: 0 }
+        // FÁCEIS (easy)
+        { text: "Calcule \\(2^3 \\times 2^4\\)", answerNum: 128, difficulty: "easy" },
+        { text: "Qual o valor de \\(9^{1/2}\\)? (raiz quadrada de 9)", answerNum: 3, difficulty: "easy" },
+        { text: "Resolva \\((2^2)^3\\)", answerNum: 64, difficulty: "easy" },
+        { text: "Quanto é \\(4^{-2}\\)? (use decimal ou fração)", answerNum: 0.0625, difficulty: "easy" },
+        { text: "Raiz quadrada de \\(16\\)", answerNum: 4, difficulty: "easy" },
+        { text: "Calcule \\(8^{2/3}\\)", answerNum: 4, difficulty: "easy" },
+        { text: "Simplifique \\(2^5 / 2^3\\)", answerNum: 4, difficulty: "easy" },
+        { text: "Quanto vale \\(5^0\\)?", answerNum: 1, difficulty: "easy" },
+        { text: "Raiz cúbica de \\(27\\)", answerNum: 3, difficulty: "easy" },
+        { text: "\\(10^3 \\times 10^{-2}\\)", answerNum: 10, difficulty: "easy" },
+        { text: "\\(16^{1/4}\\)", answerNum: 2, difficulty: "easy" },
+        { text: "\\(0^5\\)", answerNum: 0, difficulty: "easy" },
+        { text: "\\((-2)^3\\)", answerNum: -8, difficulty: "easy" },
+        { text: "\\((-2)^2\\)", answerNum: 4, difficulty: "easy" },
+        { text: "\\(2^{-3}\\)", answerNum: 0.125, difficulty: "easy" },
+        { text: "Raiz quadrada de \\(0.25\\)", answerNum: 0.5, difficulty: "easy" },
+        { text: "Raiz quarta de \\(16\\)", answerNum: 2, difficulty: "easy" },
+        { text: "Calcule \\((3^2)^{1/2}\\)", answerNum: 3, difficulty: "easy" },
+        { text: "\\(81^{1/2}\\)", answerNum: 9, difficulty: "easy" },
+        { text: "\\(100^{1/2}\\)", answerNum: 10, difficulty: "easy" },
+        { text: "\\(2^{1/2} \\times 2^{1/2}\\)", answerNum: 2, difficulty: "easy" },
+        
+        // MÉDIAS (medium)
+        { text: "\\(27^{2/3}\\)", answerNum: 9, difficulty: "medium" },
+        { text: "\\((\\frac{1}{2})^{-2}\\)", answerNum: 4, difficulty: "medium" },
+        { text: "\\(9^{3/2}\\)", answerNum: 27, difficulty: "medium" },
+        { text: "Simplifique \\((4^2)^{1/2}\\)", answerNum: 4, difficulty: "medium" },
+        { text: "\\(10^{-1}\\)", answerNum: 0.1, difficulty: "medium" },
+        { text: "\\(2^{10} / 2^8\\)", answerNum: 4, difficulty: "medium" },
+        { text: "Raiz quinta de \\(32\\)", answerNum: 2, difficulty: "medium" },
+        { text: "\\((-1)^{100}\\)", answerNum: 1, difficulty: "medium" },
+        { text: "\\((-1)^{99}\\)", answerNum: -1, difficulty: "medium" },
+        { text: "Calcule \\( (2^3 \\times 2^2) / 2^4 \\)", answerNum: 2, difficulty: "medium" },
+        { text: "\\(64^{1/3} \\times 64^{1/3}\\)", answerNum: 4, difficulty: "medium" },
+        { text: "Raiz cúbica de \\(-8\\)", answerNum: -2, difficulty: "medium" },
+        
+        // DIFÍCEIS (hard)
+        { text: "Resolva \\( (\\sqrt[3]{27})^4 \\)", answerNum: 81, difficulty: "hard" },
+        { text: "\\( \\left(\\frac{8}{27}\\right)^{2/3} \\)", answerNum: 4/9, difficulty: "hard" }, // 0.444...
+        { text: "Simplifique \\( \\frac{2^{n+2} \\cdot 4^{n-1}}{8^{n}} \\)", answerNum: 1, difficulty: "hard" },
+        { text: "\\( (0.25)^{-1/2} \\)", answerNum: 2, difficulty: "hard" },
+        { text: "Calcule \\( \\sqrt[3]{16} \\times \\sqrt[3]{4} \\)", answerNum: 4, difficulty: "hard" },
+        
+        // MUITO DIFÍCEIS (very_hard)
+        { text: "Determine \\( \\left(\\sqrt[4]{81}\\right)^{3/2} \\)", answerNum: 27, difficulty: "very_hard" },
+        { text: "Resolva \\( \\frac{2^{x+1} \\cdot 4^{1-x}}{8^{x}} \\) para x=2", answerNum: 0.125, difficulty: "very_hard" }, // 1/8
+        { text: "Simplifique \\( \\sqrt[3]{x^{2}} \\cdot \\sqrt{x^{3}} \\) quando x=4", answerNum: 32, difficulty: "very_hard" },
+        { text: "\\( \\left(\\frac{27^{-2/3}}{9^{-1/2}}\\right)^{-1} \\)", answerNum: 3, difficulty: "very_hard" }
     ];
 
-    // Parâmetros do jogo
     const QUESTIONS_PER_GAME = 10;
     const BASE_POINTS_PER_Q = 10;
-    const PASS_THRESHOLD = 70;   // 70% de 100 (máximo 100)
+    const PASS_THRESHOLD = 70;
+    
+    // Configuração de sorteados por dificuldade: 5 easy, 3 medium, 1 hard, 1 very_hard
+    const DIFFICULTY_CONFIG = {
+        easy: 5,
+        medium: 3,
+        hard: 1,
+        very_hard: 1
+    };
 
     // Estado global
-    let currentGameQuestions = [];        // array de objetos { question, answerNum, originalIndex }
+    let currentGameQuestions = [];        // array de objetos { text, answerNum, difficulty }
     let currentQuestionIndex = 0;
-    let currentQuestionValue = BASE_POINTS_PER_Q;   // pontos atuais para pergunta atual (diminui com erros)
+    let currentQuestionValue = BASE_POINTS_PER_Q;
     let totalPoints = 0;
-    let gameActive = true;                // se false, jogo finalizado (não aceita respostas)
+    let gameActive = true;
     let gameFinished = false;
-    let currentQuestionAttempts = 0;      // apenas para info visual (não limita)
+    let currentQuestionAttempts = 0;
     
     // Elementos DOM
     const questionEl = document.getElementById("questionText");
@@ -378,7 +411,7 @@
     let highScores = [];
 
     function loadHighScores() {
-        const stored = localStorage.getItem("potenciaRaizHighScores");
+        const stored = localStorage.getItem("potenciaRaizLaTeXHighScores");
         if (stored) {
             try {
                 highScores = JSON.parse(stored);
@@ -387,13 +420,12 @@
         } else {
             highScores = [];
         }
-        // ordenar decrescente por pontuação
         highScores.sort((a,b) => b.score - a.score);
         renderHighScores();
     }
 
     function saveHighScores() {
-        localStorage.setItem("potenciaRaizHighScores", JSON.stringify(highScores.slice(0, 10)));
+        localStorage.setItem("potenciaRaizLaTeXHighScores", JSON.stringify(highScores.slice(0, 10)));
         renderHighScores();
     }
 
@@ -420,20 +452,18 @@
     }
 
     function resetHighScores() {
-        if (confirm("⚠️ Tem certeza que deseja limpar todos os recordes?")) {
+        if (confirm("⚠️ Tem certeza que deseja limpar TODOS os recordes? Isso não poderá ser desfeito.")) {
             highScores = [];
             saveHighScores();
             renderHighScores();
-            feedbackDiv.innerHTML = "🏆 High scores resetados!";
+            feedbackDiv.innerHTML = "🏆 High scores limpos com sucesso!";
         }
     }
 
     // ------------------- FUNÇÕES AUXILIARES ------------------
-    // Converte resposta do usuário para número (suporta frações e decimais)
     function parseUserAnswer(answerStr) {
-        let str = answerStr.trim().replace(/,/g, '.'); // vírgula como ponto
+        let str = answerStr.trim().replace(/,/g, '.');
         if (str === "") return NaN;
-        // Verifica se é fração tipo "3/4" ou "-1/2"
         if (str.includes('/')) {
             let parts = str.split('/');
             if (parts.length === 2) {
@@ -444,37 +474,66 @@
                 }
             }
         }
-        // número decimal comum
         let num = parseFloat(str);
         return isNaN(num) ? NaN : num;
     }
 
-    // Compara respostas com tolerância para decimais
     function isAnswerCorrect(userNum, correctNum) {
         if (isNaN(userNum)) return false;
-        // tolerância absoluta para decimais (0.001)
         return Math.abs(userNum - correctNum) < 0.001;
     }
 
-    // embaralhamento Fisher-Yates para selecionar perguntas únicas
-    function getRandomQuestions(amount) {
-        if (amount > QUESTIONS_BANK.length) amount = QUESTIONS_BANK.length;
-        // copiar índices
-        const shuffledIndices = [...Array(QUESTIONS_BANK.length).keys()];
-        for (let i = shuffledIndices.length - 1; i > 0; i--) {
+    // Função para sortear perguntas por dificuldade
+    function getQuestionsByDifficulty() {
+        // Agrupar perguntas por dificuldade
+        const groups = {
+            easy: QUESTIONS_BANK.filter(q => q.difficulty === "easy"),
+            medium: QUESTIONS_BANK.filter(q => q.difficulty === "medium"),
+            hard: QUESTIONS_BANK.filter(q => q.difficulty === "hard"),
+            very_hard: QUESTIONS_BANK.filter(q => q.difficulty === "very_hard")
+        };
+        
+        // Verificar se há quantidade suficiente em cada grupo
+        for (let [diff, needed] of Object.entries(DIFFICULTY_CONFIG)) {
+            if (groups[diff].length < needed) {
+                console.warn(`Grupo ${diff} tem apenas ${groups[diff].length}, necessário ${needed}. Duplicando perguntas se necessário.`);
+                // Duplicar para alcançar quantidade (evitar erro)
+                let original = [...groups[diff]];
+                while (groups[diff].length < needed) {
+                    groups[diff] = groups[diff].concat(original);
+                }
+            }
+        }
+        
+        // Embaralhar cada grupo e pegar os primeiros N
+        function shuffleAndTake(arr, n) {
+            const shuffled = [...arr];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled.slice(0, n);
+        }
+        
+        const easySelected = shuffleAndTake(groups.easy, DIFFICULTY_CONFIG.easy);
+        const mediumSelected = shuffleAndTake(groups.medium, DIFFICULTY_CONFIG.medium);
+        const hardSelected = shuffleAndTake(groups.hard, DIFFICULTY_CONFIG.hard);
+        const veryHardSelected = shuffleAndTake(groups.very_hard, DIFFICULTY_CONFIG.very_hard);
+        
+        let allSelected = [...easySelected, ...mediumSelected, ...hardSelected, ...veryHardSelected];
+        // Embaralhar a ordem final para não ficar todas fáceis primeiro
+        for (let i = allSelected.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
-            [shuffledIndices[i], shuffledIndices[j]] = [shuffledIndices[j], shuffledIndices[i]];
+            [allSelected[i], allSelected[j]] = [allSelected[j], allSelected[i]];
         }
-        const selected = [];
-        for (let i = 0; i < amount; i++) {
-            const idx = shuffledIndices[i];
-            selected.push({
-                question: QUESTIONS_BANK[idx].text,
-                answerNum: QUESTIONS_BANK[idx].answerNum,
-                originalIndex: idx
-            });
+        return allSelected;
+    }
+
+    // Forçar re-renderização do MathJax
+    function renderMathInQuestion() {
+        if (window.MathJax) {
+            MathJax.typesetPromise([questionEl]).catch(err => console.log(err));
         }
-        return selected;
     }
 
     // Atualizar UI com pergunta atual
@@ -482,19 +541,21 @@
         if (!gameActive || gameFinished) return;
         if (currentQuestionIndex < currentGameQuestions.length) {
             const qData = currentGameQuestions[currentQuestionIndex];
-            questionEl.innerText = qData.question;
+            // Inserir texto com LaTeX (já contém \( ... \) ou $$)
+            let displayText = qData.text;
+            // Garantir que tem delimitadores LaTeX; se não tiver, adiciona (mas já estão)
+            questionEl.innerHTML = displayText;
+            renderMathInQuestion();
+            
             progressCounterSpan.innerText = currentQuestionIndex;
             currentQValueSpan.innerText = currentQuestionValue.toFixed(2);
             totalScoreSpan.innerText = totalPoints.toFixed(2);
-            // info extra
-            document.getElementById("extraInfo").innerHTML = `🔁 tentativas nesta pergunta: ${currentQuestionAttempts} | 💡 responda com número ou fração`;
+            document.getElementById("extraInfo").innerHTML = `🔁 tentativas: ${currentQuestionAttempts} | dificuldade: ${qData.difficulty}`;
         } else {
-            // caso finalize inesperadamente
             finishGame();
         }
     }
 
-    // Finaliza o jogo, mostra resultado e oferece salvar highscore
     function finishGame() {
         if (gameFinished) return;
         gameActive = false;
@@ -512,7 +573,6 @@
             ${passed ? '✅ PARABÉNS! Você passou com 70% ou mais! ✅' : '❌ Não atingiu 70% dos pontos. Estude mais e tente novamente! ❌'}
         </div>`;
         
-        // Se passou ou não, pode salvar high score (qualquer pontuação entra no ranking)
         message += `<div class="save-area" id="saveScoreArea">
                         <input type="text" id="playerNameInput" placeholder="Seu nome para o ranking" maxlength="20">
                         <button id="saveScoreBtn">💾 SALVAR PONTUAÇÃO</button>
@@ -528,22 +588,17 @@
                 addHighScore(playerName, finalScore);
                 finalArea.innerHTML += `<div style="margin-top:8px;">✨ Pontuação salva! ✨</div>`;
                 saveBtn.disabled = true;
-                // esconder botão salvar após salvar
-                setTimeout(() => {
-                    const oldDiv = document.getElementById("saveScoreArea");
-                    if(oldDiv) oldDiv.style.opacity = "0.5";
-                }, 10);
+                const oldDiv = document.getElementById("saveScoreArea");
+                if(oldDiv) oldDiv.style.opacity = "0.5";
             });
         }
         
         feedbackDiv.innerHTML = passed ? "🎉 Você atingiu a pontuação necessária! 🎉" : "📚 Continue praticando, tente novamente!";
     }
     
-    // Avança para próxima pergunta (após acerto)
     function nextQuestion() {
         currentQuestionIndex++;
         if (currentQuestionIndex < currentGameQuestions.length) {
-            // resetar valor da pergunta e tentativas
             currentQuestionValue = BASE_POINTS_PER_Q;
             currentQuestionAttempts = 0;
             updateUI();
@@ -555,12 +610,10 @@
                 if(gameActive && !gameFinished) feedbackDiv.style.opacity = "1";
             }, 10);
         } else {
-            // Fim do jogo
             finishGame();
         }
     }
     
-    // Processa a resposta do jogador na pergunta atual
     function handleAnswer() {
         if (!gameActive || gameFinished) {
             feedbackDiv.innerHTML = "⛔ Jogo finalizado. Clique em NOVO JOGO para jogar novamente!";
@@ -582,19 +635,15 @@
         const correctNumber = currentQ.answerNum;
         
         if (isAnswerCorrect(userNumber, correctNumber)) {
-            // ACERTOU: ganha o valor atual da pergunta
             const gained = currentQuestionValue;
             totalPoints += gained;
             totalScoreSpan.innerText = totalPoints.toFixed(2);
             feedbackDiv.innerHTML = `🎉 CORRETO! Você ganhou ${gained.toFixed(2)} pontos. 🎉`;
-            // Avança para próxima
             nextQuestion();
         } else {
-            // ERROU: divide o valor da pergunta pela metade
             currentQuestionAttempts++;
             const oldValue = currentQuestionValue;
             currentQuestionValue = currentQuestionValue / 2;
-            // se valor ficar extremamente pequeno mas ainda válido
             if (currentQuestionValue < 0.001 && currentQuestionValue > 0) currentQuestionValue = 0;
             currentQValueSpan.innerText = currentQuestionValue.toFixed(4);
             
@@ -603,22 +652,23 @@
             feedbackDiv.innerHTML = feedbackMsg;
             answerInput.value = "";
             answerInput.focus();
-            // Não avança, mantém mesma pergunta
-            updateUI(); // atualiza exibição do valor reduzido
-            // Se o valor chegou a zero, avisa que pode acertar mas sem ganhar pontos
+            updateUI();
             if (currentQuestionValue === 0) {
                 feedbackDiv.innerHTML += " ⚠️ Atenção: essa pergunta agora vale 0 ponto, mas você precisa acertar para prosseguir!";
             }
         }
     }
     
-    // Inicializa ou reinicia um novo jogo
     function startNewGame() {
-        // sortear novas perguntas
-        currentGameQuestions = getRandomQuestions(QUESTIONS_PER_GAME);
-        if (currentGameQuestions.length === 0) {
-            console.error("Erro no banco de perguntas");
-            return;
+        currentGameQuestions = getQuestionsByDifficulty();
+        if (currentGameQuestions.length !== QUESTIONS_PER_GAME) {
+            console.warn(`Número de perguntas sorteado: ${currentGameQuestions.length}. Ajustando...`);
+            // Se por acaso não tiver 10, complementa com fáceis
+            while(currentGameQuestions.length < QUESTIONS_PER_GAME) {
+                const easyPool = QUESTIONS_BANK.filter(q => q.difficulty === "easy");
+                if(easyPool.length) currentGameQuestions.push(easyPool[0]);
+                else break;
+            }
         }
         currentQuestionIndex = 0;
         currentQuestionValue = BASE_POINTS_PER_Q;
@@ -627,11 +677,10 @@
         gameFinished = false;
         currentQuestionAttempts = 0;
         
-        // habilitar interface
         submitBtn.disabled = false;
         answerInput.disabled = false;
         answerInput.value = "";
-        finalArea.innerHTML = ""; // limpa mensagem final
+        finalArea.innerHTML = "";
         
         updateUI();
         feedbackDiv.innerHTML = "✨ Novo jogo! Responda cada questão. Cada erro reduz o valor pela metade. ✨";
@@ -641,14 +690,11 @@
         answerInput.focus();
     }
     
-    // Eventos e inicialização
+    // Eventos
     submitBtn.addEventListener("click", handleAnswer);
-    newGameBtn.addEventListener("click", () => {
-        startNewGame();
-    });
+    newGameBtn.addEventListener("click", () => { startNewGame(); });
     resetHighScoresBtn.addEventListener("click", resetHighScores);
     
-    // Permitir enviar com Enter
     answerInput.addEventListener("keypress", (e) => {
         if (e.key === "Enter" && gameActive && !gameFinished) {
             e.preventDefault();
@@ -656,7 +702,7 @@
         }
     });
     
-    // Carregar high scores e iniciar jogo pela primeira vez
+    // Inicialização
     loadHighScores();
     startNewGame();
 </script>
