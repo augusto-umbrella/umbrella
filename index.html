@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>⚡ Potência Raiz Game | Aprenda potências e radiciação</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Poppins', 'Roboto', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #1a2a3a 0%, #0f1a24 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* container principal */
+        .game-container {
+            max-width: 1300px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            justify-content: center;
+        }
+
+        /* painel do jogo */
+        .quiz-panel {
+            flex: 2;
+            min-width: 280px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(12px);
+            border-radius: 48px;
+            padding: 24px 28px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* high scores lateral */
+        .highscore-panel {
+            flex: 1;
+            min-width: 240px;
+            background: #0f1a1f;
+            border-radius: 40px;
+            padding: 20px;
+            box-shadow: 0 15px 25px rgba(0,0,0,0.5);
+            border: 1px solid #2c4c5c;
+            backdrop-filter: blur(4px);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin: 0 0 8px 0;
+            background: linear-gradient(135deg, #FFE6B0, #FFB347);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            display: inline-block;
+        }
+
+        .sub {
+            color: #b3e4ff;
+            margin-bottom: 25px;
+            font-weight: 500;
+            border-left: 3px solid #ffb347;
+            padding-left: 12px;
+        }
+
+        .card-question {
+            background: #071217c9;
+            border-radius: 32px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #ffb34755;
+            transition: all 0.2s;
+        }
+
+        .question-text {
+            font-size: 1.7rem;
+            font-weight: bold;
+            color: #ffefcf;
+            margin-bottom: 20px;
+            word-break: break-word;
+            line-height: 1.3;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            background: #00000066;
+            padding: 12px 18px;
+            border-radius: 60px;
+            margin-bottom: 20px;
+        }
+
+        .stat {
+            background: #1e2f3a;
+            padding: 5px 14px;
+            border-radius: 40px;
+            font-weight: bold;
+            color: #ffd966;
+        }
+
+        .stat span {
+            color: white;
+            font-weight: 700;
+        }
+
+        .input-area {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .answer-input {
+            background: #0b171f;
+            border: 2px solid #3c6e8c;
+            border-radius: 60px;
+            padding: 14px 20px;
+            font-size: 1.2rem;
+            color: #f0f9ff;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .answer-input:focus {
+            border-color: #ffb347;
+            box-shadow: 0 0 12px #ffb34766;
+        }
+
+        button {
+            background: #ff914d;
+            border: none;
+            border-radius: 60px;
+            padding: 12px 20px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.1s linear;
+            color: #1e2a2f;
+            box-shadow: 0 4px 0 #a34100;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #a34100;
+        }
+
+        button.secondary {
+            background: #2c5f7a;
+            box-shadow: 0 4px 0 #153e52;
+            color: white;
+        }
+
+        .feedback {
+            background: #000000aa;
+            border-radius: 32px;
+            padding: 14px;
+            margin: 18px 0 0;
+            font-weight: 500;
+            text-align: center;
+            border-left: 6px solid #ffb347;
+        }
+
+        .points-badge {
+            background: #2f4858;
+            display: inline-block;
+            border-radius: 30px;
+            padding: 6px 16px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .progress {
+            font-size: 0.9rem;
+            margin-top: 10px;
+            text-align: right;
+            color: #bfd9ff;
+        }
+
+        .highscore-list {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+
+        .highscore-list li {
+            background: #1f2f38;
+            margin: 8px 0;
+            padding: 8px 15px;
+            border-radius: 60px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+        }
+
+        .reset-btn {
+            background: #4e3b2c;
+            box-shadow: none;
+            font-size: 0.8rem;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .newgame-btn {
+            background: #38b000;
+            box-shadow: 0 4px 0 #1f6e00;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .final-message {
+            background: #0e2a2f;
+            border-radius: 28px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .save-area {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .save-area input {
+            flex: 2;
+            background: #021016;
+            border: 1px solid #ffb347;
+            border-radius: 40px;
+            padding: 8px 16px;
+            color: white;
+        }
+
+        @media (max-width: 750px) {
+            .quiz-panel, .highscore-panel {
+                flex: 1 1 100%;
+            }
+            .question-text {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="game-container">
+    <div class="quiz-panel">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap;">
+            <h1>🔢 POTÊNCIA & RAIZ</h1>
+            <div class="points-badge">🎯 meta: 70% (70 pts)</div>
+        </div>
+        <div class="sub">⚡ potência fracionária | radiciação | propriedades</div>
+
+        <div class="stats">
+            <div class="stat">💯 TOTAL: <span id="totalScore">0</span> pts</div>
+            <div class="stat">⭐ PERGUNTA: <span id="currentQValue">10.00</span> pts</div>
+            <div class="stat">📊 PROGRESSO: <span id="progressCounter">0</span>/<span id="totalQuestions">10</span></div>
+        </div>
+
+        <div class="card-question">
+            <div class="question-text" id="questionText">Carregando desafio...</div>
+            <div class="input-area">
+                <input type="text" id="answerInput" class="answer-input" placeholder="Digite sua resposta (número ou fração ex: 1/4)" autocomplete="off">
+                <button id="submitBtn">✅ RESPONDER</button>
+                <button id="newGameBtn" class="secondary">🔄 NOVO JOGO</button>
+            </div>
+            <div id="feedback" class="feedback">✨ Responda as 10 perguntas. Cada erro reduz o valor da questão pela metade!</div>
+            <div class="progress" id="extraInfo"></div>
+        </div>
+
+        <div id="finalArea" style="margin-top: 12px;"></div>
+    </div>
+
+    <div class="highscore-panel">
+        <h2 style="font-size: 1.5rem; margin: 0 0 10px 0;">🏆 HIGH SCORES</h2>
+        <ul id="highscoreList" class="highscore-list">
+            <li style="justify-content: center; opacity: 0.7;">— nenhuma pontuação —</li>
+        </ul>
+        <button id="resetHighScoresBtn" class="reset-btn">🗑️ LIMPAR RECORDES</button>
+        <div style="font-size: 0.75rem; margin-top: 12px; text-align: center; color: #7f9faa;">
+            ✔️ A cada erro os pontos da questão caem pela metade<br>
+            ✔️ Passe com 70% da pontuação máxima (70/100)
+        </div>
+    </div>
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    //  BANCO DE PERGUNTAS (40 questões - números / frações exatas)
+    // --------------------------------------------------------------
+    const QUESTIONS_BANK = [
+        { text: "Calcule 2³ × 2⁴", answerNum: 128 },
+        { text: "Qual o valor de 9^(1/2)? (raiz quadrada de 9)", answerNum: 3 },
+        { text: "Resolva (2²)³", answerNum: 64 },
+        { text: "Quanto é 4⁻²? (use decimal ou fração)", answerNum: 0.0625 },
+        { text: "Raiz quadrada de 16", answerNum: 4 },
+        { text: "Calcule 8^(2/3)", answerNum: 4 },
+        { text: "Simplifique 2⁵ / 2³", answerNum: 4 },
+        { text: "Quanto vale 5⁰?", answerNum: 1 },
+        { text: "Raiz cúbica de 27", answerNum: 3 },
+        { text: "10³ × 10⁻²", answerNum: 10 },
+        { text: "16^(1/4)", answerNum: 2 },
+        { text: "27^(2/3)", answerNum: 9 },
+        { text: "0⁵", answerNum: 0 },
+        { text: "(-2)³", answerNum: -8 },
+        { text: "(-2)²", answerNum: 4 },
+        { text: "2⁻³", answerNum: 0.125 },
+        { text: "Raiz quadrada de 0.25", answerNum: 0.5 },
+        { text: "Raiz quarta de 16", answerNum: 2 },
+        { text: "Calcule (3²)^(1/2)", answerNum: 3 },
+        { text: "81^(1/2)", answerNum: 9 },
+        { text: "100^(1/2)", answerNum: 10 },
+        { text: "2^(1/2) × 2^(1/2)", answerNum: 2 },
+        { text: "Qual o resultado de 7¹?", answerNum: 7 },
+        { text: "Calcule (1/2)⁻²", answerNum: 4 },
+        { text: "(2³)⁰", answerNum: 1 },
+        { text: "Raiz cúbica de 64", answerNum: 4 },
+        { text: "2⁴ × 2⁻²", answerNum: 4 },
+        { text: "9^(3/2)", answerNum: 27 },
+        { text: "25^(1/2)", answerNum: 5 },
+        { text: "Simplifique (4²)^(1/2)", answerNum: 4 },
+        { text: "10⁻¹", answerNum: 0.1 },
+        { text: "Raiz quadrada de 144", answerNum: 12 },
+        { text: "64^(1/3)", answerNum: 4 },
+        { text: "(2⁵)/(2²)", answerNum: 8 },
+        { text: "(3³)^(1/3)", answerNum: 3 },
+        { text: "2¹⁰ / 2⁸", answerNum: 4 },
+        { text: "Raiz quinta de 32", answerNum: 2 },
+        { text: "(-1)¹⁰⁰", answerNum: 1 },
+        { text: "(-1)⁹⁹", answerNum: -1 },
+        { text: "0¹", answerNum: 0 }
+    ];
+
+    // Parâmetros do jogo
+    const QUESTIONS_PER_GAME = 10;
+    const BASE_POINTS_PER_Q = 10;
+    const PASS_THRESHOLD = 70;   // 70% de 100 (máximo 100)
+
+    // Estado global
+    let currentGameQuestions = [];        // array de objetos { question, answerNum, originalIndex }
+    let currentQuestionIndex = 0;
+    let currentQuestionValue = BASE_POINTS_PER_Q;   // pontos atuais para pergunta atual (diminui com erros)
+    let totalPoints = 0;
+    let gameActive = true;                // se false, jogo finalizado (não aceita respostas)
+    let gameFinished = false;
+    let currentQuestionAttempts = 0;      // apenas para info visual (não limita)
+    
+    // Elementos DOM
+    const questionEl = document.getElementById("questionText");
+    const totalScoreSpan = document.getElementById("totalScore");
+    const currentQValueSpan = document.getElementById("currentQValue");
+    const progressCounterSpan = document.getElementById("progressCounter");
+    const answerInput = document.getElementById("answerInput");
+    const submitBtn = document.getElementById("submitBtn");
+    const newGameBtn = document.getElementById("newGameBtn");
+    const feedbackDiv = document.getElementById("feedback");
+    const finalArea = document.getElementById("finalArea");
+    const highscoreList = document.getElementById("highscoreList");
+    const resetHighScoresBtn = document.getElementById("resetHighScoresBtn");
+    const totalQuestionsSpan = document.getElementById("totalQuestions");
+    
+    totalQuestionsSpan.innerText = QUESTIONS_PER_GAME;
+
+    // ------------------- HIGH SCORES (localStorage) ------------------
+    let highScores = [];
+
+    function loadHighScores() {
+        const stored = localStorage.getItem("potenciaRaizHighScores");
+        if (stored) {
+            try {
+                highScores = JSON.parse(stored);
+                if (!Array.isArray(highScores)) highScores = [];
+            } catch(e) { highScores = []; }
+        } else {
+            highScores = [];
+        }
+        // ordenar decrescente por pontuação
+        highScores.sort((a,b) => b.score - a.score);
+        renderHighScores();
+    }
+
+    function saveHighScores() {
+        localStorage.setItem("potenciaRaizHighScores", JSON.stringify(highScores.slice(0, 10)));
+        renderHighScores();
+    }
+
+    function addHighScore(name, score) {
+        if (!name || name.trim() === "") name = "Anônimo";
+        name = name.trim().slice(0, 20);
+        highScores.push({ name: name, score: parseFloat(score.toFixed(2)), date: new Date().toISOString() });
+        highScores.sort((a,b) => b.score - a.score);
+        if (highScores.length > 10) highScores.pop();
+        saveHighScores();
+    }
+
+    function renderHighScores() {
+        highscoreList.innerHTML = "";
+        if (highScores.length === 0) {
+            highscoreList.innerHTML = '<li style="justify-content: center; opacity: 0.7;">✨ sem recordes ainda ✨</li>';
+            return;
+        }
+        highScores.forEach((hs, idx) => {
+            const li = document.createElement("li");
+            li.innerHTML = `<span>${idx+1}. ${hs.name}</span><span>${hs.score.toFixed(2)} pts</span>`;
+            highscoreList.appendChild(li);
+        });
+    }
+
+    function resetHighScores() {
+        if (confirm("⚠️ Tem certeza que deseja limpar todos os recordes?")) {
+            highScores = [];
+            saveHighScores();
+            renderHighScores();
+            feedbackDiv.innerHTML = "🏆 High scores resetados!";
+        }
+    }
+
+    // ------------------- FUNÇÕES AUXILIARES ------------------
+    // Converte resposta do usuário para número (suporta frações e decimais)
+    function parseUserAnswer(answerStr) {
+        let str = answerStr.trim().replace(/,/g, '.'); // vírgula como ponto
+        if (str === "") return NaN;
+        // Verifica se é fração tipo "3/4" ou "-1/2"
+        if (str.includes('/')) {
+            let parts = str.split('/');
+            if (parts.length === 2) {
+                let numerator = parseFloat(parts[0]);
+                let denominator = parseFloat(parts[1]);
+                if (!isNaN(numerator) && !isNaN(denominator) && denominator !== 0) {
+                    return numerator / denominator;
+                }
+            }
+        }
+        // número decimal comum
+        let num = parseFloat(str);
+        return isNaN(num) ? NaN : num;
+    }
+
+    // Compara respostas com tolerância para decimais
+    function isAnswerCorrect(userNum, correctNum) {
+        if (isNaN(userNum)) return false;
+        // tolerância absoluta para decimais (0.001)
+        return Math.abs(userNum - correctNum) < 0.001;
+    }
+
+    // embaralhamento Fisher-Yates para selecionar perguntas únicas
+    function getRandomQuestions(amount) {
+        if (amount > QUESTIONS_BANK.length) amount = QUESTIONS_BANK.length;
+        // copiar índices
+        const shuffledIndices = [...Array(QUESTIONS_BANK.length).keys()];
+        for (let i = shuffledIndices.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffledIndices[i], shuffledIndices[j]] = [shuffledIndices[j], shuffledIndices[i]];
+        }
+        const selected = [];
+        for (let i = 0; i < amount; i++) {
+            const idx = shuffledIndices[i];
+            selected.push({
+                question: QUESTIONS_BANK[idx].text,
+                answerNum: QUESTIONS_BANK[idx].answerNum,
+                originalIndex: idx
+            });
+        }
+        return selected;
+    }
+
+    // Atualizar UI com pergunta atual
+    function updateUI() {
+        if (!gameActive || gameFinished) return;
+        if (currentQuestionIndex < currentGameQuestions.length) {
+            const qData = currentGameQuestions[currentQuestionIndex];
+            questionEl.innerText = qData.question;
+            progressCounterSpan.innerText = currentQuestionIndex;
+            currentQValueSpan.innerText = currentQuestionValue.toFixed(2);
+            totalScoreSpan.innerText = totalPoints.toFixed(2);
+            // info extra
+            document.getElementById("extraInfo").innerHTML = `🔁 tentativas nesta pergunta: ${currentQuestionAttempts} | 💡 responda com número ou fração`;
+        } else {
+            // caso finalize inesperadamente
+            finishGame();
+        }
+    }
+
+    // Finaliza o jogo, mostra resultado e oferece salvar highscore
+    function finishGame() {
+        if (gameFinished) return;
+        gameActive = false;
+        gameFinished = true;
+        submitBtn.disabled = true;
+        answerInput.disabled = true;
+        const finalScore = totalPoints;
+        const passed = finalScore >= PASS_THRESHOLD;
+        const percent = (finalScore / (QUESTIONS_PER_GAME * BASE_POINTS_PER_Q)) * 100;
+        
+        let message = `<div class="final-message">
+            <strong>🏁 FIM DE JOGO!</strong><br>
+            🎯 Pontuação total: ${finalScore.toFixed(2)} / ${QUESTIONS_PER_GAME * BASE_POINTS_PER_Q}<br>
+            📈 Aproveitamento: ${percent.toFixed(1)}%<br>
+            ${passed ? '✅ PARABÉNS! Você passou com 70% ou mais! ✅' : '❌ Não atingiu 70% dos pontos. Estude mais e tente novamente! ❌'}
+        </div>`;
+        
+        // Se passou ou não, pode salvar high score (qualquer pontuação entra no ranking)
+        message += `<div class="save-area" id="saveScoreArea">
+                        <input type="text" id="playerNameInput" placeholder="Seu nome para o ranking" maxlength="20">
+                        <button id="saveScoreBtn">💾 SALVAR PONTUAÇÃO</button>
+                    </div>`;
+        finalArea.innerHTML = message;
+        
+        const saveBtn = document.getElementById("saveScoreBtn");
+        if (saveBtn) {
+            saveBtn.addEventListener("click", () => {
+                const nameInput = document.getElementById("playerNameInput");
+                let playerName = nameInput ? nameInput.value.trim() : "Anônimo";
+                if (playerName === "") playerName = "Anônimo";
+                addHighScore(playerName, finalScore);
+                finalArea.innerHTML += `<div style="margin-top:8px;">✨ Pontuação salva! ✨</div>`;
+                saveBtn.disabled = true;
+                // esconder botão salvar após salvar
+                setTimeout(() => {
+                    const oldDiv = document.getElementById("saveScoreArea");
+                    if(oldDiv) oldDiv.style.opacity = "0.5";
+                }, 10);
+            });
+        }
+        
+        feedbackDiv.innerHTML = passed ? "🎉 Você atingiu a pontuação necessária! 🎉" : "📚 Continue praticando, tente novamente!";
+    }
+    
+    // Avança para próxima pergunta (após acerto)
+    function nextQuestion() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < currentGameQuestions.length) {
+            // resetar valor da pergunta e tentativas
+            currentQuestionValue = BASE_POINTS_PER_Q;
+            currentQuestionAttempts = 0;
+            updateUI();
+            answerInput.value = "";
+            answerInput.disabled = false;
+            submitBtn.disabled = false;
+            feedbackDiv.innerHTML = "✅ Acertou! Próxima pergunta. Responda com calma.";
+            setTimeout(() => {
+                if(gameActive && !gameFinished) feedbackDiv.style.opacity = "1";
+            }, 10);
+        } else {
+            // Fim do jogo
+            finishGame();
+        }
+    }
+    
+    // Processa a resposta do jogador na pergunta atual
+    function handleAnswer() {
+        if (!gameActive || gameFinished) {
+            feedbackDiv.innerHTML = "⛔ Jogo finalizado. Clique em NOVO JOGO para jogar novamente!";
+            return;
+        }
+        if (currentQuestionIndex >= currentGameQuestions.length) {
+            finishGame();
+            return;
+        }
+        
+        const userRaw = answerInput.value.trim();
+        if (userRaw === "") {
+            feedbackDiv.innerHTML = "📝 Digite uma resposta antes de enviar!";
+            return;
+        }
+        
+        const userNumber = parseUserAnswer(userRaw);
+        const currentQ = currentGameQuestions[currentQuestionIndex];
+        const correctNumber = currentQ.answerNum;
+        
+        if (isAnswerCorrect(userNumber, correctNumber)) {
+            // ACERTOU: ganha o valor atual da pergunta
+            const gained = currentQuestionValue;
+            totalPoints += gained;
+            totalScoreSpan.innerText = totalPoints.toFixed(2);
+            feedbackDiv.innerHTML = `🎉 CORRETO! Você ganhou ${gained.toFixed(2)} pontos. 🎉`;
+            // Avança para próxima
+            nextQuestion();
+        } else {
+            // ERROU: divide o valor da pergunta pela metade
+            currentQuestionAttempts++;
+            const oldValue = currentQuestionValue;
+            currentQuestionValue = currentQuestionValue / 2;
+            // se valor ficar extremamente pequeno mas ainda válido
+            if (currentQuestionValue < 0.001 && currentQuestionValue > 0) currentQuestionValue = 0;
+            currentQValueSpan.innerText = currentQuestionValue.toFixed(4);
+            
+            let feedbackMsg = `❌ ERRADO! Resposta correta seria ${correctNumber}. `;
+            feedbackMsg += `O valor dessa pergunta caiu pela metade: ${oldValue.toFixed(2)} → ${currentQuestionValue.toFixed(2)} pts. Tente novamente!`;
+            feedbackDiv.innerHTML = feedbackMsg;
+            answerInput.value = "";
+            answerInput.focus();
+            // Não avança, mantém mesma pergunta
+            updateUI(); // atualiza exibição do valor reduzido
+            // Se o valor chegou a zero, avisa que pode acertar mas sem ganhar pontos
+            if (currentQuestionValue === 0) {
+                feedbackDiv.innerHTML += " ⚠️ Atenção: essa pergunta agora vale 0 ponto, mas você precisa acertar para prosseguir!";
+            }
+        }
+    }
+    
+    // Inicializa ou reinicia um novo jogo
+    function startNewGame() {
+        // sortear novas perguntas
+        currentGameQuestions = getRandomQuestions(QUESTIONS_PER_GAME);
+        if (currentGameQuestions.length === 0) {
+            console.error("Erro no banco de perguntas");
+            return;
+        }
+        currentQuestionIndex = 0;
+        currentQuestionValue = BASE_POINTS_PER_Q;
+        totalPoints = 0;
+        gameActive = true;
+        gameFinished = false;
+        currentQuestionAttempts = 0;
+        
+        // habilitar interface
+        submitBtn.disabled = false;
+        answerInput.disabled = false;
+        answerInput.value = "";
+        finalArea.innerHTML = ""; // limpa mensagem final
+        
+        updateUI();
+        feedbackDiv.innerHTML = "✨ Novo jogo! Responda cada questão. Cada erro reduz o valor pela metade. ✨";
+        totalScoreSpan.innerText = "0";
+        progressCounterSpan.innerText = "0";
+        currentQValueSpan.innerText = BASE_POINTS_PER_Q.toFixed(2);
+        answerInput.focus();
+    }
+    
+    // Eventos e inicialização
+    submitBtn.addEventListener("click", handleAnswer);
+    newGameBtn.addEventListener("click", () => {
+        startNewGame();
+    });
+    resetHighScoresBtn.addEventListener("click", resetHighScores);
+    
+    // Permitir enviar com Enter
+    answerInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter" && gameActive && !gameFinished) {
+            e.preventDefault();
+            handleAnswer();
+        }
+    });
+    
+    // Carregar high scores e iniciar jogo pela primeira vez
+    loadHighScores();
+    startNewGame();
+</script>
+</body>
+</html>
