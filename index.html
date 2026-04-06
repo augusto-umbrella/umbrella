@@ -73,7 +73,7 @@
 <script>
     // ========== CONFIGURAÇÃO ==========
     // 🔻 COLE A URL DO SEU WEB APP AQUI 🔻
-    const GOOGLE_SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbz1zqQkSVHlHZKo9ADgeknPYiUzKLLdsmVnGDZIEFb6rXGe0BgXA_2oLFxMt5leepo/exec";
+    const GOOGLE_SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbwul7qTyyjwtx1cl1AAhGKkk7u-8cJPduWtoeY5gbqyJn-J6MynIgsrU-gRXR_Smjc/exec";
     // 🔺🔺🔺 SUBSTITUA PELA URL GERADA NO PASSO 3 🔺🔺🔺
     
     let rankingOnline = true; // se falhar, usa fallback localStorage
@@ -115,32 +115,27 @@
     }
     
     async function salvarPontuacao(nome, pontuacao) {
-        try {
-            const response = await fetch(GOOGLE_SHEETS_API_URL, {
-                method: "POST",
-                mode: "cors",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ nome: nome, pontuacao: pontuacao })
-            });
-            const resultado = await response.json();
-            if (resultado.status === "ok") {
-                console.log("✅ Pontuação salva na planilha!");
-                return true;
-            } else {
-                throw new Error(resultado.msg || "Erro desconhecido");
-            }
-        } catch (err) {
-            console.error("Erro ao salvar online:", err);
-            // Fallback localStorage
-            let localScores = JSON.parse(localStorage.getItem("potenciaLocalRanking") || "[]");
-            localScores.push({ name: nome, score: parseFloat(pontuacao.toFixed(2)), date: new Date().toISOString() });
-            localScores.sort((a,b) => b.score - a.score);
-            if (localScores.length > 10) localScores = localScores.slice(0,10);
-            localStorage.setItem("potenciaLocalRanking", JSON.stringify(localScores));
-            console.log("💾 Salvo localmente (fallback)");
-            return true; // consideramos sucesso para o usuário
+    try {
+        const url = `${GOOGLE_SHEETS_API_URL}?nome=${encodeURIComponent(nome)}&pontuacao=${pontuacao}`;
+        const response = await fetch(url);
+        const resultado = await response.json();
+        if (resultado.status === "ok") {
+            console.log("✅ Pontuação salva na planilha!");
+            return true;
+        } else {
+            throw new Error(resultado.message || "Erro desconhecido");
         }
+    } catch (err) {
+        console.error("Erro ao salvar online:", err);
+        // Fallback localStorage
+        let localScores = JSON.parse(localStorage.getItem("potenciaLocalRanking") || "[]");
+        localScores.push({ name: nome, score: parseFloat(pontuacao.toFixed(2)), date: new Date().toISOString() });
+        localScores.sort((a,b) => b.score - a.score);
+        if (localScores.length > 10) localScores = localScores.slice(0,10);
+        localStorage.setItem("potenciaLocalRanking", JSON.stringify(localScores));
+        return true;
     }
+}
     
     // ========== BANCO DE PERGUNTAS ==========
     const QUESTIONS_BANK = [
