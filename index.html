@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚡ Potência & Raiz | Ranking Global + Fallback</title>
+    <title>⚡ Potência & Raiz | Ranking Google Sheets</title>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
     <style>
         * { box-sizing: border-box; font-family: system-ui, 'Segoe UI', sans-serif; }
@@ -41,7 +41,7 @@
     <div class="quiz-panel">
         <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap;">
             <h1>🔢 POTÊNCIA & RAIZ</h1>
-            <div class="points-badge" id="rankingStatus">🌍 Ranking Global</div>
+            <div class="points-badge" id="rankingStatus">🌍 Ranking Global (Google Sheets)</div>
         </div>
         <div class="sub">⚡ LaTeX | 5 fáceis + 3 médias + 1 difícil + 1 muito difícil</div>
         <div class="stats">
@@ -56,119 +56,93 @@
                 <button id="submitBtn">✅ RESPONDER</button>
                 <button id="newGameBtn" class="secondary">🔄 NOVO JOGO</button>
             </div>
-            <div id="feedback" class="feedback">✨ Cada erro reduz o valor da questão pela metade.</div>
+            <div id="feedback" class="feedback">✨ Cada erro reduz o valor da questão pela metade. Ranking global via Google Sheets!</div>
         </div>
         <div id="finalArea"></div>
     </div>
     <div class="highscore-panel">
-        <h2 style="font-size: 1.5rem;">🏆 HIGH SCORES</h2>
+        <h2 style="font-size: 1.5rem;">🏆 HIGH SCORES (MUNDIAL)</h2>
         <ul id="highscoreList" class="highscore-list"><li>Carregando ranking...</li></ul>
-        <button id="refreshRankBtn" class="reset-btn" style="background:#2c5f7a;">🔄 ATUALIZAR</button>
+        <button id="refreshRankBtn" class="reset-btn" style="background:#2c5f7a;">🔄 ATUALIZAR RANKING</button>
         <div style="font-size: 0.7rem; margin-top: 12px; text-align: center; color:#7f9faa;" id="rankSourceMsg">
-            📡 Conectando ao Firebase...
+            📡 Conectando ao Google Sheets...
         </div>
     </div>
 </div>
 
-<script type="module">
-    // ================= CONFIGURAÇÃO DO FIREBASE =================
-    // 🔻🔻🔻 COLE SEU firebaseConfig AQUI 🔻🔻🔻
-    const firebaseConfig = {
-        apiKey: "AIzaSyAB-KL7SstDFcXjFrXEAAc4GBCtEq9NFz4",
-        authDomain: "potencia-388ca.firebaseapp.com",
-        projectId: "potencia-388ca",
-        storageBucket: "potencia-388ca.firebasestorage.app",
-        messagingSenderId: "628025358063",
-        appId: "1:628025358063:web:6a5176035ad95a4a47cd1a"
-    };
-    // 🔺🔺🔺 SUBSTITUA PELOS DADOS REAIS 🔺🔺🔺
+<script>
+    // ========== CONFIGURAÇÃO ==========
+    // 🔻 COLE A URL DO SEU WEB APP AQUI 🔻
+    const GOOGLE_SHEETS_API_URL = "https://script.google.com/macros/s/SEU_ID_AQUI/exec";
+    // 🔺🔺🔺 SUBSTITUA PELA URL GERADA NO PASSO 3 🔺🔺🔺
     
-    // Import Firebase modular
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, query, orderBy, limit, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    let rankingOnline = true; // se falhar, usa fallback localStorage
     
-    let db = null;
-    let firebaseAvailable = false;
-    let fallbackScores = []; // localStorage fallback
-    
-    try {
-        const app = initializeApp(firebaseConfig);
-        db = getFirestore(app);
-        firebaseAvailable = true;
-        console.log("✅ Firebase inicializado com sucesso!");
-        document.getElementById("rankSourceMsg").innerHTML = "🌍 Ranking global (Firebase)";
-        document.getElementById("rankingStatus").innerHTML = "🌍 Ranking Global ✅";
-    } catch (err) {
-        console.error("❌ Erro ao inicializar Firebase:", err);
-        firebaseAvailable = false;
-        document.getElementById("rankSourceMsg").innerHTML = "💾 Ranking local (navegador) - Firebase não configurado";
-        document.getElementById("rankingStatus").innerHTML = "💾 Modo Local";
-        // Carregar fallback do localStorage
-        const stored = localStorage.getItem("potenciaLocalRanking");
-        if (stored) fallbackScores = JSON.parse(stored);
-        else fallbackScores = [];
-    }
-    
-    // Funções de ranking com fallback
-    async function loadRanking() {
-        const listEl = document.getElementById("highscoreList");
-        listEl.innerHTML = '<li>Carregando...</li>';
+    // ========== FUNÇÕES DE RANKING ==========
+    async function carregarRanking() {
+        const listaEl = document.getElementById("highscoreList");
+        const msgEl = document.getElementById("rankSourceMsg");
+        listaEl.innerHTML = '<li>Carregando...</li>';
         
-        if (firebaseAvailable && db) {
-            try {
-                const q = query(collection(db, "highscores"), orderBy("score", "desc"), limit(10));
-                const snapshot = await getDocs(q);
-                const scores = snapshot.docs.map(doc => doc.data());
-                if (scores.length === 0) {
-                    listEl.innerHTML = '<li>✨ Nenhuma pontuação global ainda. Seja o primeiro!</li>';
-                } else {
-                    listEl.innerHTML = scores.map((hs, idx) => `<li><span>${idx+1}. ${hs.name}</span><span>${hs.score.toFixed(2)} pts</span></li>`).join('');
-                }
-                return;
-            } catch (err) {
-                console.error("Erro ao carregar ranking Firebase:", err);
-                // fallback para local em caso de erro de rede/permissão
-                listEl.innerHTML = '<li>⚠️ Erro no Firebase. Usando ranking local.</li>';
-                // continua para fallback
+        try {
+            const response = await fetch(GOOGLE_SHEETS_API_URL);
+            if (!response.ok) throw new Error("HTTP " + response.status);
+            const scores = await response.json();
+            if (scores.length === 0) {
+                listaEl.innerHTML = '<li>✨ Nenhuma pontuação ainda. Seja o primeiro!</li>';
+            } else {
+                listaEl.innerHTML = scores.map((hs, idx) => 
+                    `<li><span>${idx+1}. ${hs.nome}</span><span>${hs.pontuacao.toFixed(2)} pts</span></li>`
+                ).join('');
             }
-        }
-        
-        // Fallback: localStorage
-        const localScores = JSON.parse(localStorage.getItem("potenciaLocalRanking") || "[]");
-        localScores.sort((a,b) => b.score - a.score);
-        if (localScores.length === 0) {
-            listEl.innerHTML = '<li>📀 Nenhuma pontuação local. Jogue e salve!</li>';
-        } else {
-            listEl.innerHTML = localScores.slice(0,10).map((hs, idx) => `<li><span>${idx+1}. ${hs.name}</span><span>${hs.score.toFixed(2)} pts</span></li>`).join('');
+            msgEl.innerHTML = "🌍 Ranking global (Google Sheets) ✅";
+            rankingOnline = true;
+        } catch (err) {
+            console.error("Erro ao carregar ranking online:", err);
+            // Fallback: localStorage
+            const localScores = JSON.parse(localStorage.getItem("potenciaLocalRanking") || "[]");
+            localScores.sort((a,b) => b.score - a.score);
+            if (localScores.length === 0) {
+                listaEl.innerHTML = '<li>💾 Nenhuma pontuação local. Jogue e salve!</li>';
+            } else {
+                listaEl.innerHTML = localScores.slice(0,10).map((hs, idx) => 
+                    `<li><span>${idx+1}. ${hs.name}</span><span>${hs.score.toFixed(2)} pts</span></li>`
+                ).join('');
+            }
+            msgEl.innerHTML = "💾 Ranking local (navegador) - Fallback ativado";
+            rankingOnline = false;
         }
     }
     
-    async function saveScoreToRanking(name, score) {
-        if (firebaseAvailable && db) {
-            try {
-                await addDoc(collection(db, "highscores"), {
-                    name: name.substring(0,20),
-                    score: parseFloat(score.toFixed(2)),
-                    timestamp: serverTimestamp()
-                });
-                console.log("✅ Pontuação salva no Firebase");
+    async function salvarPontuacao(nome, pontuacao) {
+        try {
+            const response = await fetch(GOOGLE_SHEETS_API_URL, {
+                method: "POST",
+                mode: "cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ nome: nome, pontuacao: pontuacao })
+            });
+            const resultado = await response.json();
+            if (resultado.status === "ok") {
+                console.log("✅ Pontuação salva na planilha!");
                 return true;
-            } catch (err) {
-                console.error("Erro ao salvar no Firebase:", err);
-                // continua para fallback
+            } else {
+                throw new Error(resultado.msg || "Erro desconhecido");
             }
+        } catch (err) {
+            console.error("Erro ao salvar online:", err);
+            // Fallback localStorage
+            let localScores = JSON.parse(localStorage.getItem("potenciaLocalRanking") || "[]");
+            localScores.push({ name: nome, score: parseFloat(pontuacao.toFixed(2)), date: new Date().toISOString() });
+            localScores.sort((a,b) => b.score - a.score);
+            if (localScores.length > 10) localScores = localScores.slice(0,10);
+            localStorage.setItem("potenciaLocalRanking", JSON.stringify(localScores));
+            console.log("💾 Salvo localmente (fallback)");
+            return true; // consideramos sucesso para o usuário
         }
-        // Fallback: salvar no localStorage
-        let localScores = JSON.parse(localStorage.getItem("potenciaLocalRanking") || "[]");
-        localScores.push({ name: name.substring(0,20), score: parseFloat(score.toFixed(2)), date: new Date().toISOString() });
-        localScores.sort((a,b) => b.score - a.score);
-        if (localScores.length > 10) localScores = localScores.slice(0,10);
-        localStorage.setItem("potenciaLocalRanking", JSON.stringify(localScores));
-        console.log("💾 Pontuação salva no localStorage (fallback)");
-        return true;
     }
     
-    // ================= BANCO DE PERGUNTAS =================
+    // ========== BANCO DE PERGUNTAS ==========
     const QUESTIONS_BANK = [
         { text: "Calcule \\(2^3 \\times 2^4\\)", answerNum: 128, difficulty: "easy" },
         { text: "Qual o valor de \\(9^{1/2}\\)?", answerNum: 3, difficulty: "easy" },
@@ -292,7 +266,7 @@
             ${passed ? '✅ APROVADO! ✅' : '❌ REPROVADO ❌'}
         </div>
         <div class="save-area">
-            <input type="text" id="playerName" placeholder="Seu nome (ranking)" maxlength="20">
+            <input type="text" id="playerName" placeholder="Seu nome (ranking mundial)" maxlength="20">
             <button id="saveRankBtn">💾 SALVAR PONTUAÇÃO</button>
         </div>`;
         finalArea.innerHTML = html;
@@ -301,9 +275,9 @@
             const nameInput = document.getElementById("playerName");
             let name = nameInput.value.trim();
             if (!name) name = "Anônimo";
-            const ok = await saveScoreToRanking(name, finalScore);
-            feedbackDiv.innerHTML = ok ? "🏅 Pontuação salva!" : "❌ Erro ao salvar. Tente novamente.";
-            if (ok) loadRanking();
+            const ok = await salvarPontuacao(name, finalScore);
+            feedbackDiv.innerHTML = ok ? "🏅 Pontuação salva no ranking global!" : "❌ Erro ao salvar. Tente novamente.";
+            if (ok) carregarRanking();
             saveBtn.disabled = true;
         };
         feedbackDiv.innerHTML = passed ? "Parabéns! Você atingiu a meta!" : "Que pena! Tente outra vez.";
@@ -381,11 +355,11 @@
     // Eventos
     submitBtn.onclick = handleAnswer;
     newGameBtn.onclick = startNewGame;
-    refreshRankBtn.onclick = () => { loadRanking(); feedbackDiv.innerHTML = "🔄 Ranking atualizado!"; };
+    refreshRankBtn.onclick = () => { carregarRanking(); feedbackDiv.innerHTML = "🔄 Ranking atualizado!"; };
     answerInput.addEventListener("keypress", (e) => { if(e.key === "Enter") handleAnswer(); });
     
     // Inicialização
-    loadRanking();
+    carregarRanking();
     startNewGame();
 </script>
 </body>
