@@ -85,7 +85,7 @@
         listaEl.innerHTML = '<li>Carregando...</li>';
         
         try {
-            const response = await fetch(GOOGLE_SHEETS_API_URL);
+            const response = await fetch("https://script.google.com/macros/s/AKfycbyTKzpTJsgw_3t4qHHk6bIujz78HYkG0YHiTvalqKU4_-YoMG_9awIw2AtdlmyQLMA/exec");
             if (!response.ok) throw new Error("HTTP " + response.status);
             const scores = await response.json();
             if (scores.length === 0) {
@@ -116,7 +116,7 @@
     
     async function salvarPontuacao(nome, pontuacao) {
         try {
-            const response = await fetch(GOOGLE_SHEETS_API_URL, {
+            const response = await fetch("https://script.google.com/macros/s/AKfycbyTKzpTJsgw_3t4qHHk6bIujz78HYkG0YHiTvalqKU4_-YoMG_9awIw2AtdlmyQLMA/exec"), {
                 method: "POST",
                 mode: "cors",
                 headers: { "Content-Type": "application/json" },
