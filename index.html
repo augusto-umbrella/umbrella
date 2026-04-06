@@ -73,7 +73,7 @@
 <script>
     // ========== CONFIGURAÇÃO ==========
     // 🔻 COLE A URL DO SEU WEB APP AQUI 🔻
-    const GOOGLE_SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbymgoosoZI3puMvZ6Mmx1BD0VQOhZ5sh46FpH_Ksn3T2O-xffkEbmPwT6EKK4OjscU/exec";
+    const GOOGLE_SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbyUYZ9_L4p_m6iXBHPIunJ2Mzk53-z_h74bl4QS-wOeAv_Dtx-x3zhGa5tgxURvnLU/exec";
     // 🔺🔺🔺 SUBSTITUA PELA URL GERADA NO PASSO 3 🔺🔺🔺
     
     let rankingOnline = true; // se falhar, usa fallback localStorage
@@ -85,7 +85,7 @@
         listaEl.innerHTML = '<li>Carregando...</li>';
         
         try {
-            const response = await fetch("https://script.google.com/macros/s/AKfycbyTKzpTJsgw_3t4qHHk6bIujz78HYkG0YHiTvalqKU4_-YoMG_9awIw2AtdlmyQLMA/exec");
+            const response = await fetch(GOOGLE_SHEETS_API_URL);
             if (!response.ok) throw new Error("HTTP " + response.status);
             const scores = await response.json();
             if (scores.length === 0) {
@@ -116,7 +116,7 @@
     
     async function salvarPontuacao(nome, pontuacao) {
         try {
-            const response = await fetch("https://script.google.com/macros/s/AKfycbyTKzpTJsgw_3t4qHHk6bIujz78HYkG0YHiTvalqKU4_-YoMG_9awIw2AtdlmyQLMA/exec"), {
+            const response = await fetch(GOOGLE_SHEETS_API_URL, {
                 method: "POST",
                 mode: "cors",
                 headers: { "Content-Type": "application/json" },
@@ -177,7 +177,7 @@
     
     const QUESTIONS_PER_GAME = 10;
     const BASE_POINTS = 10;
-    const PASS_THRESHOLD = 70;
+    const PASS_THRESHOLD = 90;
     const DIFFICULTY_CONFIG = { easy:5, medium:3, hard:1, very_hard:1 };
     
     let currentGame = [];
