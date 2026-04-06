@@ -2,63 +2,19 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>⚡ Potência & Raiz Game | Ranking Global 🔥</title>
-    <!-- MathJax para LaTeX -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ Potência & Raiz | Ranking Global + Fallback</title>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
-    <!-- Firebase SDKs -->
-    <script type="module">
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-        // ⚠️ SUBSTITUA ESTE OBJETO PELO SEU firebaseConfig DO CONSOLE DO FIREBASE ⚠️
-        const firebaseConfig = {
-            apiKey: "AIzaSyAB-KL7SstDFcXjFrXEAAc4GBCtEq9NFz4",
-            authDomain: "potencia-388ca.firebaseapp.com",
-            projectId: "potencia-388ca",
-            storageBucket: "potencia-388ca.firebasestorage.app",
-            messagingSenderId: "628025358063",
-            appId: "1:628025358063:web:6a5176035ad95a4a47cd1a"
-        };
-        // Importar Firebase modular (versão 9+)
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, query, orderBy, limit, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        
-        // Expor funções globalmente para o restante do script (não-modular)
-        window.db = db;
-        window.firestoreHelpers = {
-            getHighScores: async () => {
-                const q = query(collection(db, "highscores"), orderBy("score", "desc"), limit(10));
-                const snapshot = await getDocs(q);
-                return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            },
-            addHighScore: async (name, score) => {
-                try {
-                    await addDoc(collection(db, "highscores"), {
-                        name: name.substring(0, 20),
-                        score: parseFloat(score.toFixed(2)),
-                        timestamp: serverTimestamp()
-                    });
-                    return true;
-                } catch (e) {
-                    console.error("Erro ao salvar: ", e);
-                    return false;
-                }
-            }
-        };
-    </script>
     <style>
-        * { box-sizing: border-box; font-family: system-ui, 'Segoe UI', 'Poppins', 'Roboto', sans-serif; }
+        * { box-sizing: border-box; font-family: system-ui, 'Segoe UI', sans-serif; }
         body { background: linear-gradient(145deg, #1a2a3a 0%, #0f1a24 100%); min-height: 100vh; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; }
         .game-container { max-width: 1300px; width: 100%; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 24px; justify-content: center; }
         .quiz-panel { flex: 2; min-width: 280px; background: rgba(255,255,255,0.1); backdrop-filter: blur(12px); border-radius: 48px; padding: 24px 28px; box-shadow: 0 20px 35px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); }
         .highscore-panel { flex: 1; min-width: 240px; background: #0f1a1f; border-radius: 40px; padding: 20px; box-shadow: 0 15px 25px rgba(0,0,0,0.5); border: 1px solid #2c4c5c; }
-        h1 { font-size: 2rem; margin: 0 0 8px 0; background: linear-gradient(135deg, #FFE6B0, #FFB347); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        h1 { font-size: 2rem; margin: 0 0 8px; background: linear-gradient(135deg, #FFE6B0, #FFB347); -webkit-background-clip: text; background-clip: text; color: transparent; }
         .sub { color: #b3e4ff; margin-bottom: 25px; border-left: 3px solid #ffb347; padding-left: 12px; }
         .card-question { background: #071217c9; border-radius: 32px; padding: 20px; margin: 20px 0; border: 1px solid #ffb34755; }
-        .question-text { font-size: 1.8rem; font-weight: bold; color: #ffefcf; margin-bottom: 20px; text-align: center; background: #00000033; padding: 15px; border-radius: 24px; overflow-x: auto; }
+        .question-text { font-size: 1.8rem; font-weight: bold; color: #ffefcf; text-align: center; background: #00000033; padding: 15px; border-radius: 24px; overflow-x: auto; }
         .stats { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; background: #00000066; padding: 12px 18px; border-radius: 60px; margin-bottom: 20px; }
         .stat { background: #1e2f3a; padding: 5px 14px; border-radius: 40px; font-weight: bold; color: #ffd966; }
         .stat span { color: white; }
@@ -85,7 +41,7 @@ const app = initializeApp(firebaseConfig);
     <div class="quiz-panel">
         <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap;">
             <h1>🔢 POTÊNCIA & RAIZ</h1>
-            <div class="points-badge">🌍 Ranking Global | meta: 70 pts</div>
+            <div class="points-badge" id="rankingStatus">🌍 Ranking Global</div>
         </div>
         <div class="sub">⚡ LaTeX | 5 fáceis + 3 médias + 1 difícil + 1 muito difícil</div>
         <div class="stats">
@@ -100,32 +56,119 @@ const app = initializeApp(firebaseConfig);
                 <button id="submitBtn">✅ RESPONDER</button>
                 <button id="newGameBtn" class="secondary">🔄 NOVO JOGO</button>
             </div>
-            <div id="feedback" class="feedback">✨ Cada erro reduz o valor da questão pela metade. Ranking global!</div>
+            <div id="feedback" class="feedback">✨ Cada erro reduz o valor da questão pela metade.</div>
         </div>
         <div id="finalArea"></div>
     </div>
     <div class="highscore-panel">
-        <h2 style="font-size: 1.5rem;">🏆 HIGH SCORES (MUNDIAL)</h2>
+        <h2 style="font-size: 1.5rem;">🏆 HIGH SCORES</h2>
         <ul id="highscoreList" class="highscore-list"><li>Carregando ranking...</li></ul>
-        <button id="refreshRankBtn" class="reset-btn" style="background:#2c5f7a;">🔄 ATUALIZAR RANKING</button>
-        <div style="font-size: 0.7rem; margin-top: 12px; text-align: center; color:#7f9faa;">
-            ✔️ Pontuações salvas no Firebase (global)<br>
-            ✔️ Acessível de qualquer dispositivo
+        <button id="refreshRankBtn" class="reset-btn" style="background:#2c5f7a;">🔄 ATUALIZAR</button>
+        <div style="font-size: 0.7rem; margin-top: 12px; text-align: center; color:#7f9faa;" id="rankSourceMsg">
+            📡 Conectando ao Firebase...
         </div>
     </div>
 </div>
 
 <script type="module">
-    // Importações e globais do Firebase já carregadas no módulo anterior
-    // Como o script principal precisa usar async/await, farei tudo dentro deste módulo.
+    // ================= CONFIGURAÇÃO DO FIREBASE =================
+    // 🔻🔻🔻 COLE SEU firebaseConfig AQUI 🔻🔻🔻
+    const firebaseConfig = {
+        apiKey: "AIzaSyAB-KL7SstDFcXjFrXEAAc4GBCtEq9NFz4",
+        authDomain: "potencia-388ca.firebaseapp.com",
+        projectId: "potencia-388ca",
+        storageBucket: "potencia-388ca.firebasestorage.app",
+        messagingSenderId: "628025358063",
+        appId: "1:628025358063:web:6a5176035ad95a4a47cd1a"
+    };
+    // 🔺🔺🔺 SUBSTITUA PELOS DADOS REAIS 🔺🔺🔺
+    
+    // Import Firebase modular
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, query, orderBy, limit, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     
-    const db = window.db;
-    if (!db) console.error("Firebase não inicializado! Verifique seu firebaseConfig.");
+    let db = null;
+    let firebaseAvailable = false;
+    let fallbackScores = []; // localStorage fallback
     
-    // --------------------------------------------------------------
-    // BANCO DE PERGUNTAS (LaTeX + dificuldade)
-    // --------------------------------------------------------------
+    try {
+        const app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+        firebaseAvailable = true;
+        console.log("✅ Firebase inicializado com sucesso!");
+        document.getElementById("rankSourceMsg").innerHTML = "🌍 Ranking global (Firebase)";
+        document.getElementById("rankingStatus").innerHTML = "🌍 Ranking Global ✅";
+    } catch (err) {
+        console.error("❌ Erro ao inicializar Firebase:", err);
+        firebaseAvailable = false;
+        document.getElementById("rankSourceMsg").innerHTML = "💾 Ranking local (navegador) - Firebase não configurado";
+        document.getElementById("rankingStatus").innerHTML = "💾 Modo Local";
+        // Carregar fallback do localStorage
+        const stored = localStorage.getItem("potenciaLocalRanking");
+        if (stored) fallbackScores = JSON.parse(stored);
+        else fallbackScores = [];
+    }
+    
+    // Funções de ranking com fallback
+    async function loadRanking() {
+        const listEl = document.getElementById("highscoreList");
+        listEl.innerHTML = '<li>Carregando...</li>';
+        
+        if (firebaseAvailable && db) {
+            try {
+                const q = query(collection(db, "highscores"), orderBy("score", "desc"), limit(10));
+                const snapshot = await getDocs(q);
+                const scores = snapshot.docs.map(doc => doc.data());
+                if (scores.length === 0) {
+                    listEl.innerHTML = '<li>✨ Nenhuma pontuação global ainda. Seja o primeiro!</li>';
+                } else {
+                    listEl.innerHTML = scores.map((hs, idx) => `<li><span>${idx+1}. ${hs.name}</span><span>${hs.score.toFixed(2)} pts</span></li>`).join('');
+                }
+                return;
+            } catch (err) {
+                console.error("Erro ao carregar ranking Firebase:", err);
+                // fallback para local em caso de erro de rede/permissão
+                listEl.innerHTML = '<li>⚠️ Erro no Firebase. Usando ranking local.</li>';
+                // continua para fallback
+            }
+        }
+        
+        // Fallback: localStorage
+        const localScores = JSON.parse(localStorage.getItem("potenciaLocalRanking") || "[]");
+        localScores.sort((a,b) => b.score - a.score);
+        if (localScores.length === 0) {
+            listEl.innerHTML = '<li>📀 Nenhuma pontuação local. Jogue e salve!</li>';
+        } else {
+            listEl.innerHTML = localScores.slice(0,10).map((hs, idx) => `<li><span>${idx+1}. ${hs.name}</span><span>${hs.score.toFixed(2)} pts</span></li>`).join('');
+        }
+    }
+    
+    async function saveScoreToRanking(name, score) {
+        if (firebaseAvailable && db) {
+            try {
+                await addDoc(collection(db, "highscores"), {
+                    name: name.substring(0,20),
+                    score: parseFloat(score.toFixed(2)),
+                    timestamp: serverTimestamp()
+                });
+                console.log("✅ Pontuação salva no Firebase");
+                return true;
+            } catch (err) {
+                console.error("Erro ao salvar no Firebase:", err);
+                // continua para fallback
+            }
+        }
+        // Fallback: salvar no localStorage
+        let localScores = JSON.parse(localStorage.getItem("potenciaLocalRanking") || "[]");
+        localScores.push({ name: name.substring(0,20), score: parseFloat(score.toFixed(2)), date: new Date().toISOString() });
+        localScores.sort((a,b) => b.score - a.score);
+        if (localScores.length > 10) localScores = localScores.slice(0,10);
+        localStorage.setItem("potenciaLocalRanking", JSON.stringify(localScores));
+        console.log("💾 Pontuação salva no localStorage (fallback)");
+        return true;
+    }
+    
+    // ================= BANCO DE PERGUNTAS =================
     const QUESTIONS_BANK = [
         { text: "Calcule \\(2^3 \\times 2^4\\)", answerNum: 128, difficulty: "easy" },
         { text: "Qual o valor de \\(9^{1/2}\\)?", answerNum: 3, difficulty: "easy" },
@@ -181,41 +224,8 @@ const app = initializeApp(firebaseConfig);
     const newGameBtn = document.getElementById("newGameBtn");
     const feedbackDiv = document.getElementById("feedback");
     const finalArea = document.getElementById("finalArea");
-    const highscoreList = document.getElementById("highscoreList");
     const refreshRankBtn = document.getElementById("refreshRankBtn");
     
-    // ------------------- HIGH SCORES (Firebase) -------------------
-    async function loadGlobalHighScores() {
-        try {
-            const q = query(collection(db, "highscores"), orderBy("score", "desc"), limit(10));
-            const snapshot = await getDocs(q);
-            const scores = snapshot.docs.map(doc => doc.data());
-            if (scores.length === 0) {
-                highscoreList.innerHTML = '<li>✨ Nenhuma pontuação ainda. Seja o primeiro!</li>';
-                return;
-            }
-            highscoreList.innerHTML = scores.map((hs, idx) => `<li><span>${idx+1}. ${hs.name}</span><span>${hs.score.toFixed(2)} pts</span></li>`).join('');
-        } catch (err) {
-            console.error("Erro ao carregar ranking:", err);
-            highscoreList.innerHTML = '<li>⚠️ Erro ao carregar ranking. Verifique Firebase.</li>';
-        }
-    }
-    
-    async function saveScoreToGlobal(name, score) {
-        try {
-            await addDoc(collection(db, "highscores"), {
-                name: name.substring(0,20),
-                score: parseFloat(score.toFixed(2)),
-                timestamp: serverTimestamp()
-            });
-            return true;
-        } catch (e) {
-            console.error("Falha ao salvar:", e);
-            return false;
-        }
-    }
-    
-    // ------------------- Lógica do jogo -------------------
     function shuffleArray(arr) {
         for (let i = arr.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -255,12 +265,14 @@ const app = initializeApp(firebaseConfig);
             progressSpan.innerText = currentIndex;
             qValueSpan.innerText = currentValue.toFixed(2);
             totalSpan.innerText = totalPoints.toFixed(2);
-            document.getElementById("extraInfo")?.remove();
-            const extra = document.createElement("div");
-            extra.className = "progress";
-            extra.id = "extraInfo";
+            let extra = document.getElementById("extraInfo");
+            if (!extra) {
+                extra = document.createElement("div");
+                extra.id = "extraInfo";
+                extra.className = "progress";
+                document.querySelector(".card-question").appendChild(extra);
+            }
             extra.innerHTML = `🔁 tentativas: ${attempts} | dificuldade: ${currentGame[currentIndex].difficulty}`;
-            document.querySelector(".card-question").appendChild(extra);
         } else finishGame();
     }
     
@@ -280,7 +292,7 @@ const app = initializeApp(firebaseConfig);
             ${passed ? '✅ APROVADO! ✅' : '❌ REPROVADO ❌'}
         </div>
         <div class="save-area">
-            <input type="text" id="playerName" placeholder="Seu nome (ranking mundial)" maxlength="20">
+            <input type="text" id="playerName" placeholder="Seu nome (ranking)" maxlength="20">
             <button id="saveRankBtn">💾 SALVAR PONTUAÇÃO</button>
         </div>`;
         finalArea.innerHTML = html;
@@ -289,9 +301,9 @@ const app = initializeApp(firebaseConfig);
             const nameInput = document.getElementById("playerName");
             let name = nameInput.value.trim();
             if (!name) name = "Anônimo";
-            const ok = await saveScoreToGlobal(name, finalScore);
-            feedbackDiv.innerHTML = ok ? "🏅 Pontuação salva no ranking mundial!" : "❌ Erro ao salvar. Tente novamente.";
-            if(ok) loadGlobalHighScores();
+            const ok = await saveScoreToRanking(name, finalScore);
+            feedbackDiv.innerHTML = ok ? "🏅 Pontuação salva!" : "❌ Erro ao salvar. Tente novamente.";
+            if (ok) loadRanking();
             saveBtn.disabled = true;
         };
         feedbackDiv.innerHTML = passed ? "Parabéns! Você atingiu a meta!" : "Que pena! Tente outra vez.";
@@ -360,7 +372,7 @@ const app = initializeApp(firebaseConfig);
         answerInput.value = "";
         finalArea.innerHTML = "";
         updateUI();
-        feedbackDiv.innerHTML = "✨ Novo jogo! Cada erro reduz o valor pela metade. Ranking global! ✨";
+        feedbackDiv.innerHTML = "✨ Novo jogo! Cada erro reduz o valor pela metade. ✨";
         totalSpan.innerText = "0";
         progressSpan.innerText = "0";
         qValueSpan.innerText = BASE_POINTS.toFixed(2);
@@ -369,11 +381,11 @@ const app = initializeApp(firebaseConfig);
     // Eventos
     submitBtn.onclick = handleAnswer;
     newGameBtn.onclick = startNewGame;
-    refreshRankBtn.onclick = loadGlobalHighScores;
+    refreshRankBtn.onclick = () => { loadRanking(); feedbackDiv.innerHTML = "🔄 Ranking atualizado!"; };
     answerInput.addEventListener("keypress", (e) => { if(e.key === "Enter") handleAnswer(); });
     
     // Inicialização
-    loadGlobalHighScores();
+    loadRanking();
     startNewGame();
 </script>
 </body>
