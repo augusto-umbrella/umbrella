@@ -192,7 +192,7 @@ const QUESTIONS_BANK = [
         { text: "Simplifique \\( \\frac{ (2^{3})^{4} \\cdot 2^{-5} }{ 2^{6} } \\)", answerNum: 2, difficulty: "hard" },
         { text: "Calcule \\( (0.125)^{-\\frac{2}{3}} \\)", answerNum: 4, difficulty: "hard" },
         { text: "Determine \\( (\\frac{27}{8})^{\\frac{2}{3}} \\)", answerNum: 9/4, difficulty: "hard" }, // 9/4
-        { text: "Resolva \\( \\frac{2^{x+1} \\cdot 4^{1-x}}{8^{x}} \\) para x = 3", answerNum: 0.015625, difficulty: "hard" },
+        { text: "Resolva \\( \\frac{2^{x+1} \\cdot 4^{1-x}}{8^{x}} \\) para x = 3", answerNum: 1/512, difficulty: "hard" },
         { text: "Calcule \\( (16^{\\frac{3}{4}} \\div 8^{\\frac{2}{3}}) \\)", answerNum: 2, difficulty: "hard" },
         { text: "Simplifique \\( \\frac{ (3^{2})^{3} \\cdot 27^{-1} }{ 9^{2} } \\)", answerNum: 1/3, difficulty: "hard" }, // 3^6 * 3^-3 / 3^4 = 3^-1 corrigido para 3 se for simplificação específica, mas o valor real é 1/3 ou 0.333. REVISÃO: (3^6 * 3^-3)/3^4 = 3^3/3^4 = 3^-1 = 0.333.
         { text: "Determine \\( \\left( \\frac{1}{81} \\right)^{-\\frac{3}{4}} \\)", answerNum: 27, difficulty: "hard" },
@@ -213,7 +213,7 @@ const QUESTIONS_BANK = [
         { text: "Resolva \\( (\\frac{3}{4})^{-2} \\times (\\frac{16}{9})^{\\frac{1}{2}} \\)", answerNum: 64/27, difficulty: "very_hard" }, // (16/9) * (sqrt(8)/3)
         { text: "Determine \\( \\frac{ (2^{\\frac{1}{2}} \\cdot 4^{\\frac{3}{4}}) }{ (8^{\\frac{2}{3}}) } \\)", answerNum: 1, difficulty: "very_hard" }, // (2^0.5 * 2^1.5) / 2^2 = 2^2 / 2^2 = 1
         { text: "Calcule \\( (\\frac{1}{2})^{-3} \\times (\\frac{1}{4})^{\\frac{1}{2}} \\div (\\frac{1}{8})^{-\\frac{2}{3}} \\)", answerNum: 1, difficulty: "very_hard" }, // (8 * 0.5) / 4 = 1
-        { text: "Resolva \\( \\frac{2^{x+1} \\cdot 4^{1-x}}{8^{x}} \\) para x=2", answerNum: 0.125, difficulty: "very_hard" }
+        { text: "Resolva \\( \\frac{2^{x+1} \\cdot 4^{1-x}}{8^{x}} \\) para x=2", answerNum: 1/32, difficulty: "very_hard" }
     ];
     
     const QUESTIONS_PER_GAME = 15;
@@ -375,7 +375,7 @@ const QUESTIONS_BANK = [
     
     function startNewGame() {
         currentGame = getQuestionsByDifficulty();
-        if (currentGame.length !== 10) console.warn("Ajuste nas perguntas");
+        if (currentGame.length !== 15) console.warn("Ajuste nas perguntas");
         currentIndex = 0;
         currentValue = BASE_POINTS;
         totalPoints = 0;
