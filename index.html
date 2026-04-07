@@ -26,7 +26,7 @@
         button.secondary { background: #2c5f7a; box-shadow: 0 4px 0 #153e52; color: white; }
         .feedback { background: #000000aa; border-radius: 32px; padding: 14px; margin: 18px 0 0; text-align: center; border-left: 6px solid #ffb347; color: white; }
         .points-badge { background: #2f4858; display: inline-block; border-radius: 30px; padding: 6px 16px; font-size: 0.9rem; }
-        .highscore-list { list-style: none; padding: 0; margin: 15px 0; }
+        .highscore-list { list-style: none; padding: 0; margin: 15px 0; color: white;}
         .highscore-list li { background: #1f2f38; margin: 8px 0; padding: 8px 15px; border-radius: 60px; display: flex; justify-content: space-between; font-weight: bold; }
         .reset-btn { background: #4e3b2c; box-shadow: none; font-size: 0.8rem; margin-top: 15px; width: 100%; }
         .newgame-btn { background: #38b000; box-shadow: 0 4px 0 #1f6e00; margin-top: 15px; width: 100%; }
@@ -61,7 +61,7 @@
         <div id="finalArea"></div>
     </div>
     <div class="highscore-panel">
-        <h2 style="font-size: 1.5rem;">🏆 HIGHSCORES</h2>
+        <h2 style="font-size: 1.5rem; color: white;">🏆 HIGHSCORES</h2>
         <ul id="highscoreList" class="highscore-list"><li>Carregando ranking...</li></ul>
         <button id="refreshRankBtn" class="reset-btn" style="background:#2c5f7a;">🔄 ATUALIZAR RANKING</button>
         <div style="font-size: 0.7rem; margin-top: 12px; text-align: center; color:#7f9faa;" id="rankSourceMsg">
@@ -95,7 +95,7 @@
                     `<li><span>${idx+1}. ${hs.nome}</span><span>${hs.pontuacao.toFixed(2)} pts</span></li>`
                 ).join('');
             }
-            msgEl.innerHTML = "🌍 Ranking global (Google Sheets) ✅";
+            msgEl.innerHTML = "🌍 Ranking da sala";
             rankingOnline = true;
         } catch (err) {
             console.error("Erro ao carregar ranking online:", err);
